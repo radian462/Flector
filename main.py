@@ -14,11 +14,35 @@ class option:
     overwrite_index: int = 0
     filetime_index: int = 0
 
-op = option()
 
-'''
+
 def main(page: ft.Page):
-'''
+    def main_page():
+        url_tf = ft.TextField(
+            label="URL",
+            border="underline",
+            prefix_icon=ft.icons.LINK,
+            value=op.url,
+            expand=True,
+        )
+        page.views.append(
+            ft.View(
+                "/",
+                [url_tf]
+            )
+        )
+    
+    def route_change(route):
+        page.views.clear()
+        if page.route == "/":
+            main_page()
+        page.update()
+        
+    op = option()
+    page.title = "Flector"
+    page.on_route_change = route_change
+    page.go(page.route)
+
 
 if __name__ == "__main__":
     ft.app(target=main)
