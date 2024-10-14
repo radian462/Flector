@@ -90,10 +90,82 @@ def main(page: ft.Page):
         )
     )
     
+    def setting_page():
+        back_button = ft.TextButton(icon="arrow_back", on_click=lambda _: page.go("/"))
+
+        ext_list = ["mp3", "wav", "m4a", "aac", "flac"]
+        ext_tab = ft.Tabs(
+            on_change=op.tab("ext_index"),
+            selected_index=op.ext_index,
+            tabs=[ft.Tab(text=e) for e in ext_list],
+        )
+
+        quality_list = ["240p", "360p", "480p", "720p", "1080p", "最高画質"]
+        quality_tab = ft.Tabs(
+            on_change=op.tab("quality_index"),
+            selected_index=op.quality_index,
+            tabs=[ft.Tab(text=e) for e in quality_list],
+        )
+
+        title_tf = ft.TextField(
+            value=op.title,
+            on_change=op.textfield("title"),
+            border="underline",
+        )
+
+        storage_tf = ft.TextField(
+            value=op.storage,
+            on_change=op.textfield("storage"),
+            border="underline",
+        )
+
+        overwrite_list = ["True", "False"]
+        overwrite_tab = ft.Tabs(
+            on_change=op.tab("overwrite_index"),
+            selected_index=op.overwrite_index,
+            tabs=[ft.Tab(text=e) for e in overwrite_list],
+        )
+
+        filetime_list = ["現在時刻", "投稿時刻"]
+        filetime_tab = ft.Tabs(
+            on_change=op.tab("filetime_index"),
+            selected_index=op.filetime_index,
+            tabs=[ft.Tab(text=e) for e in filetime_list],
+        )
+
+        setting_elements = [
+            {"text": "画質", "widget": quality_tab},
+            {"text": "タイトル", "widget": title_tf},
+            {"text": "保存場所", "widget": storage_tf},
+            {"text": "同じファイル名がある場合上書きする", "widget": overwrite_tab},
+            {"text": "ファイルの更新日時", "widget": filetime_tab},
+        ]
+        if op.format_index == 2:
+            setting_elements.insert(0, {"text": "拡張子", "widget": ext_tab})
+
+        page.views.append(
+            ft.View(
+                "/settings",
+                [
+                    ft.Row([back_button, ft.Text("設定", size=20)]),
+                    ft.Column([
+                        ft.Container(
+                            ft.Column([
+                                ft.Text(e["text"], size=20, weight=ft.FontWeight.BOLD),
+                                e["widget"],
+                            ])
+                        ) for e in setting_elements
+                    ]),
+                ]
+            )
+        )
+
     def route_change(route):
         page.views.clear()
         if page.route == "/":
             main_page()
+        elif page.route == "/settings":
+            setting_page()
         page.update()
 
     op = option()
