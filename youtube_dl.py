@@ -4,15 +4,14 @@ import os
 from pathlib import Path
 from pytz import timezone
 from yt_dlp import YoutubeDL
-import sys
-from io import StringIO
 
 
 @dataclass
 class dl_data:
     format_count: int = 0
     format_now: int = 1
-    
+
+
 dd = dl_data()
 
 
@@ -26,7 +25,7 @@ def youtube_dl(
     overwrite=True,
     timestamp="Now",
     progress_hooks=None,
-    ):
+):
     if not ext:
         if format != "audio":
             ext = "mp4"
@@ -49,7 +48,7 @@ def youtube_dl(
     }
 
     dd.format_count = 0
-    
+
     if progress_hooks:
         ydl_opts["progress_hooks"] = progress_hooks
 
@@ -80,6 +79,3 @@ def youtube_dl(
         os.utime(absolute_path, (now, now))
 
     return absolute_path
-
-if __name__ == "__main__":
-    youtube_dl("https://youtu.be/TWCpHgnu1mE", progress_hooks=[hook])

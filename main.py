@@ -3,6 +3,7 @@ import flet as ft
 import os
 from youtube_dl import youtube_dl, dd
 
+
 class option:
     def __init__(self):
         self.url = ""
@@ -17,12 +18,15 @@ class option:
     def textfield(self, var):
         def set_value(e):
             setattr(self, var, e.control.value)
+
         return set_value
 
     def tab(self, var):
         def set_value(e):
             setattr(self, var, e.control.selected_index)
+
         return set_value
+
 
 def main(page: ft.Page):
     def main_page():
@@ -36,9 +40,7 @@ def main(page: ft.Page):
         )
 
         download_b = ft.TextButton(
-            "ダウンロード", 
-            icon="download", 
-            on_click=lambda _: page.go("/download")
+            "ダウンロード", icon="download", on_click=lambda _: page.go("/download")
         )
 
         format_tab = ft.Tabs(
@@ -52,44 +54,45 @@ def main(page: ft.Page):
         )
 
         setting_b = ft.TextButton(
-            "設定", 
-            icon=ft.icons.SETTINGS, 
+            "設定",
+            icon=ft.icons.SETTINGS,
             on_click=lambda _: page.go("/settings"),
         )
 
         page.views.append(
             ft.View(
-            "/",
-            [
-                ft.Container(
-                    ft.Column(
-                        [
-                            ft.Row(
-                                [url_tf, download_b],
-                                alignment=ft.MainAxisAlignment.CENTER
-                            ),
-                            ft.Row(
-                                [
-                                    format_tab,
-                                    ft.Container(
-                                        setting_b,
-                                        alignment=ft.alignment.center_right,
-                                        expand=True,
-                                    ),
-                                ],
-                                alignment=ft.MainAxisAlignment.SPACE_BETWEEN
-                            ),
-                        ],
-                        alignment=ft.MainAxisAlignment.CENTER,
+                "/",
+                [
+                    ft.Container(
+                        ft.Column(
+                            [
+                                ft.Row(
+                                    [url_tf, download_b],
+                                    alignment=ft.MainAxisAlignment.CENTER,
+                                ),
+                                ft.Row(
+                                    [
+                                        format_tab,
+                                        ft.Container(
+                                            setting_b,
+                                            alignment=ft.alignment.center_right,
+                                            expand=True,
+                                        ),
+                                    ],
+                                    alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
+                                ),
+                            ],
+                            alignment=ft.MainAxisAlignment.CENTER,
+                            expand=True,
+                        ),
+                        alignment=ft.alignment.center,
                         expand=True,
-                    ),
-                    alignment=ft.alignment.center,
-                    expand=True,
-                )
-            ]
+                        padding=ft.padding.only(bottom=75),
+                    )
+                ],
+            )
         )
-    )
-    
+
     def setting_page():
         back_button = ft.TextButton(icon="arrow_back", on_click=lambda _: page.go("/"))
 
@@ -147,16 +150,32 @@ def main(page: ft.Page):
             ft.View(
                 "/settings",
                 [
-                    ft.Row([back_button, ft.Text("設定", size=20)]),
-                    ft.Column([
-                        ft.Container(
-                            ft.Column([
-                                ft.Text(e["text"], size=20, weight=ft.FontWeight.BOLD),
-                                e["widget"],
-                            ])
-                        ) for e in setting_elements
-                    ]),
-                ]
+                    ft.Column(
+                        [
+                            ft.Row([back_button, ft.Text("設定", size=20)]),
+                            ft.Column(
+                                [
+                                    ft.Container(
+                                        ft.Column(
+                                            [
+                                                ft.Text(
+                                                    e["text"],
+                                                    size=20,
+                                                    weight=ft.FontWeight.BOLD,
+                                                    ),
+                                                    e["widget"],
+                                            ]
+                                        ),
+                                        margin=ft.margin.only(top=30 if i != 0 else 0),
+                                    )
+                                    for i, e in enumerate(setting_elements)
+                                ]
+                            ),
+                        ],
+                        scroll=ft.ScrollMode.ALWAYS, 
+                        expand=True
+                    )
+                ],
             )
         )
 
