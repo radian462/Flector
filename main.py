@@ -24,7 +24,6 @@ class option:
     def tab(self, var):
         def set_value(e):
             setattr(self, var, e.control.selected_index)
-
         return set_value
 
 
@@ -178,6 +177,44 @@ def main(page: ft.Page):
                 ],
             )
         )
+    
+    def download_page():
+        def progress_hook(d):
+            pass
+
+        format_dict = {
+            "format": ["movie", "movie_mute", "audio"],
+            "ext": ["mp3", "wav", "m4a", "aac", "flac", None],
+            "quality": [240, 360, 480, 720, 1080, "Best"],
+            "overwrite": [True, False],
+            "timestamp": ["Now", "posted"],
+        }
+
+        format_dict = {
+            "format": ["movie", "movie_mute", "audio"],
+            "ext": ["mp3", "wav", "m4a", "aac", "flac", None],
+            "quality": [240, 360, 480, 720, 1080, "Best"],
+            "overwrite": [True, False],
+            "timestamp": ["Now", "posted"],
+        }
+
+        if not op.title:
+            op.title = "%(title)s"
+
+        if op.format_index != 2:
+            op.ext_index = 5
+
+        youtube_dl(
+            url=op.url,
+            format=format_dict["format"][op.format_index],
+            quality=format_dict["quality"][op.quality_index],
+            ext=format_dict["ext"][op.ext_index],
+            title=op.title,
+            storage=op.storage,
+            overwrite=format_dict["overwrite"][op.overwrite_index],
+            timestamp=format_dict["timestamp"][op.filetime_index],
+            progress_hooks=[progress_hook],
+        )
 
     def route_change(route):
         page.views.clear()
@@ -185,6 +222,8 @@ def main(page: ft.Page):
             main_page()
         elif page.route == "/settings":
             setting_page()
+        elif page.route == "/download":
+            download_page()
         page.update()
 
     op = option()
