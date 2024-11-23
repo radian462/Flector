@@ -16,26 +16,15 @@ class option:
         self.overwrite_index = 0
         self.filetime_index = 0
 
-    
+
 def main(page: ft.Page):
-    def text_change(var):
-        def set_value(e):
-            setattr(op, var, e.control.value)
-
-        return set_value
-
-    def tab_change(var):
-        def set_value(e):
-            setattr(op, var, e.control.selected_index)
-        return set_value
-
     def main_page():
         url_tf = ft.TextField(
             label="URL",
             border="underline",
             prefix_icon=ft.icons.LINK,
             value=op.url,
-            on_change=lambda _: text_change("url"),
+            on_change=lambda e: setattr(op, "url", e.control.value),
             expand=True,
         )
 
@@ -45,7 +34,7 @@ def main(page: ft.Page):
 
         format_tab = ft.Tabs(
             selected_index=op.format_index,
-            on_change=tab_change("format_index"),
+            on_change=lambda e: setattr(op, "format_index", e.control.selected_index),
             tabs=[
                 ft.Tab(text="動画"),
                 ft.Tab(icon=ft.icons.VOLUME_OFF, text="動画"),
@@ -98,40 +87,42 @@ def main(page: ft.Page):
 
         ext_list = ["mp3", "wav", "m4a", "aac", "flac"]
         ext_tab = ft.Tabs(
-            on_change=tab_change("ext_index"),
+            on_change=lambda e: setattr(op, "ext_index", e.control.selected_index),
             selected_index=op.ext_index,
             tabs=[ft.Tab(text=e) for e in ext_list],
         )
 
         quality_list = ["240p", "360p", "480p", "720p", "1080p", "最高画質"]
         quality_tab = ft.Tabs(
-            on_change=tab_change("quality_index"),
+            on_change=lambda e: setattr(op, "quality_index", e.control.selected_index),
             selected_index=op.quality_index,
             tabs=[ft.Tab(text=e) for e in quality_list],
         )
 
         title_tf = ft.TextField(
             value=op.title,
-            on_change=text_change("title"),
+            on_change=lambda e: setattr(op, "title", e.control.value),
             border="underline",
         )
 
         storage_tf = ft.TextField(
             value=op.storage,
-            on_change=text_change("storage"),
+            on_change=lambda e: setattr(op, "storage", e.control.value),
             border="underline",
         )
 
         overwrite_list = ["True", "False"]
         overwrite_tab = ft.Tabs(
-            on_change=tab_change("overwrite_index"),
+            on_change=lambda e: setattr(
+                op, "overwrite_index", e.control.selected_index
+            ),
             selected_index=op.overwrite_index,
             tabs=[ft.Tab(text=e) for e in overwrite_list],
         )
 
         filetime_list = ["現在時刻", "投稿時刻"]
         filetime_tab = ft.Tabs(
-            on_change=tab_change("filetime_index"),
+            on_change=lambda e: setattr(op, "filetime_index", e.control.selected_index),
             selected_index=op.filetime_index,
             tabs=[ft.Tab(text=e) for e in filetime_list],
         )
@@ -162,8 +153,8 @@ def main(page: ft.Page):
                                                     e["text"],
                                                     size=20,
                                                     weight=ft.FontWeight.BOLD,
-                                                    ),
-                                                    e["widget"],
+                                                ),
+                                                e["widget"],
                                             ]
                                         ),
                                         margin=ft.margin.only(top=30 if i != 0 else 0),
@@ -172,19 +163,19 @@ def main(page: ft.Page):
                                 ]
                             ),
                         ],
-                        scroll=ft.ScrollMode.ALWAYS, 
-                        expand=True
+                        scroll=ft.ScrollMode.ALWAYS,
+                        expand=True,
                     )
                 ],
             )
         )
-    
+
     def download_page():
         def progress_hook(d):
             format_value = {
-                "movie":["動画","音声"],
-                "movie_mute": ["動画"], 
-                "audio": ["音声"]
+                "movie": ["動画", "音声"],
+                "movie_mute": ["動画"],
+                "audio": ["音声"],
             }
 
             if d["status"] == "downloading":
@@ -194,16 +185,21 @@ def main(page: ft.Page):
                     .replace("%", "")
                 )
                 download_pb.value = percent * 0.01
-                dl_display.value = format_value[format_dict["format"][op.format_index]][format_count - 1] + "ダウンロード中"
+                dl_display.value = (
+                    format_value[format_dict["format"][op.format_index]][
+                        op.now_format - 1
+                    ]
+                    + "ダウンロード中"
+                )
                 page.update()
             elif d["status"] == "finished":
-                if format_count > now_format:
-                    format_count += 1
+                if op.format_count > op.now_format:
+                    op.now_format += 1
                 else:
                     page.go("/")
-        
-        now_format = 1
-        format_count = 2 if op.format_index == 0 else 1
+
+        op.now_format = 1
+        op.format_count = 2 if op.format_index == 0 else 1
 
         download_pb = ft.ProgressBar(width=page.window.width * 0.9, value=0)
         dl_display = ft.Text(value="動画情報を取得中です", size=20)
@@ -224,6 +220,7 @@ def main(page: ft.Page):
                 ],
             )
         )
+        page.update()
 
         format_dict = {
             "format": ["movie", "movie_mute", "audio"],
