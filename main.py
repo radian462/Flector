@@ -16,8 +16,8 @@ class option:
         self.overwrite_index = 0
         self.filetime_index = 0
 
-
-def main(page: ft.Page):
+    
+def main(page: ft.Page):    
     def main_page():
         url_tf = ft.TextField(
             label="URL",
@@ -113,9 +113,7 @@ def main(page: ft.Page):
 
         overwrite_list = ["True", "False"]
         overwrite_tab = ft.Tabs(
-            on_change=lambda e: setattr(
-                op, "overwrite_index", e.control.selected_index
-            ),
+            on_change=lambda e: setattr(op, "overwrite_index", e.control.selected_index),
             selected_index=op.overwrite_index,
             tabs=[ft.Tab(text=e) for e in overwrite_list],
         )
@@ -153,8 +151,8 @@ def main(page: ft.Page):
                                                     e["text"],
                                                     size=20,
                                                     weight=ft.FontWeight.BOLD,
-                                                ),
-                                                e["widget"],
+                                                    ),
+                                                    e["widget"],
                                             ]
                                         ),
                                         margin=ft.margin.only(top=30 if i != 0 else 0),
@@ -163,19 +161,19 @@ def main(page: ft.Page):
                                 ]
                             ),
                         ],
-                        scroll=ft.ScrollMode.ALWAYS,
-                        expand=True,
+                        scroll=ft.ScrollMode.ALWAYS, 
+                        expand=True
                     )
                 ],
             )
         )
-
+    
     def download_page():
         def progress_hook(d):
             format_value = {
-                "movie": ["動画", "音声"],
-                "movie_mute": ["動画"],
-                "audio": ["音声"],
+                "movie":["動画","音声"],
+                "movie_mute": ["動画"], 
+                "audio": ["音声"]
             }
 
             if d["status"] == "downloading":
@@ -185,12 +183,7 @@ def main(page: ft.Page):
                     .replace("%", "")
                 )
                 download_pb.value = percent * 0.01
-                dl_display.value = (
-                    format_value[format_dict["format"][op.format_index]][
-                        op.now_format - 1
-                    ]
-                    + "ダウンロード中"
-                )
+                dl_display.value = format_value[format_dict["format"][op.format_index]][op.now_format - 1] + "ダウンロード中"
                 page.update()
             elif d["status"] == "finished":
                 if op.format_count > op.now_format:
@@ -200,7 +193,7 @@ def main(page: ft.Page):
 
         op.now_format = 1
         op.format_count = 2 if op.format_index == 0 else 1
-
+        
         download_pb = ft.ProgressBar(width=page.window.width * 0.9, value=0)
         dl_display = ft.Text(value="動画情報を取得中です", size=20)
 
