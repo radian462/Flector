@@ -16,7 +16,7 @@ class option:
         self.overwrite_index = 0
         self.filetime_index = 0
 
-
+    
 def main(page: ft.Page):
     def text_change(var):
         def set_value(e):
@@ -27,7 +27,6 @@ def main(page: ft.Page):
     def tab_change(var):
         def set_value(e):
             setattr(op, var, e.control.selected_index)
-
         return set_value
 
     def main_page():
@@ -163,8 +162,8 @@ def main(page: ft.Page):
                                                     e["text"],
                                                     size=20,
                                                     weight=ft.FontWeight.BOLD,
-                                                ),
-                                                e["widget"],
+                                                    ),
+                                                    e["widget"],
                                             ]
                                         ),
                                         margin=ft.margin.only(top=30 if i != 0 else 0),
@@ -173,14 +172,39 @@ def main(page: ft.Page):
                                 ]
                             ),
                         ],
-                        scroll=ft.ScrollMode.ALWAYS,
-                        expand=True,
+                        scroll=ft.ScrollMode.ALWAYS, 
+                        expand=True
                     )
                 ],
             )
         )
-
+    
     def download_page():
+        def progress_hook(d):
+            format_value = {
+                "movie":["動画","音声"],
+                "movie_mute": ["動画"], 
+                "audio": ["音声"]
+            }
+
+            if d["status"] == "downloading":
+                percent = float(
+                    re.sub(r"\x1b\[[0-9;]*m", "", d["_percent_str"])
+                    .strip()
+                    .replace("%", "")
+                )
+                download_pb.value = percent * 0.01
+                dl_display.value = format_value[format_dict["format"][op.format_index]][format_count - 1] + "ダウンロード中"
+                page.update()
+            elif d["status"] == "finished":
+                if format_count > now_format:
+                    format_count += 1
+                else:
+                    page.go("/")
+        
+        now_format = 1
+        format_count = 2 if op.format_index == 0 else 1
+
         download_pb = ft.ProgressBar(width=page.window.width * 0.9, value=0)
         dl_display = ft.Text(value="動画情報を取得中です", size=20)
 
@@ -200,19 +224,6 @@ def main(page: ft.Page):
                 ],
             )
         )
-
-        def progress_hook(d):
-            if d["status"] == "downloading":
-                percent = float(
-                    re.sub(r"\x1b\[[0-9;]*m", "", d["_percent_str"])
-                    .strip()
-                    .replace("%", "")
-                )
-                download_pb.value = percent * 0.01
-                page.update()
-
-        now_format = 1
-        format_count = 2 if op.format_index == 0 else 1
 
         format_dict = {
             "format": ["movie", "movie_mute", "audio"],
