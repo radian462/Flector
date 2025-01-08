@@ -2,7 +2,8 @@ import os
 import re
 
 import flet as ft
-from youtube_dl import youtube_dl, dd
+
+from youtube_dl import youtube_dl
 
 
 class option:
